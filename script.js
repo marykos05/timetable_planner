@@ -180,7 +180,6 @@ class TaskManager {
         const tasksList = document.getElementById('tasksList');
         const noTasks = document.getElementById('noTasks');
         
-        // Очищаем список задач
         tasksList.innerHTML = '';
 
         const selectedDateStr = this.currentDate.toISOString().split('T')[0];
@@ -204,7 +203,6 @@ class TaskManager {
 
         noTasks.style.display = 'none';
 
-        // Группируем задачи по часу
         const tasksByHour = {};
         for (let hour = 8; hour <= 22; hour++) {
             tasksByHour[hour] = [];
@@ -217,7 +215,6 @@ class TaskManager {
             }
         });
 
-        // Создаём блоки по часам
         for (let hour = 8; hour <= 22; hour++) {
             const hourBlock = document.createElement('div');
             hourBlock.className = 'hour-block';
@@ -284,7 +281,32 @@ class TaskManager {
         return taskElement;
     }
 
-    // --- Остальные методы без изменений ---
+    toggleTaskComplete(taskId) {
+        const taskIndex = this.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+            this.tasks[taskIndex].completed = !this.tasks[taskIndex].completed;
+            this.saveToStorage();
+
+            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+            if (taskElement) {
+                const checkmark = taskElement.querySelector('.task-checkmark');
+                const titleText = taskElement.querySelector('.task-title-text');
+                
+                if (this.tasks[taskIndex].completed) {
+                    checkmark.textContent = '✓';
+                    taskElement.classList.add('completed');
+                    titleText.style.textDecoration = 'line-through';
+                    titleText.style.opacity = '0.7';
+                } else {
+                    checkmark.textContent = '';
+                    taskElement.classList.remove('completed');
+                    titleText.style.textDecoration = 'none';
+                    titleText.style.opacity = '1';
+                }
+            }
+        }
+    }
+
     openTaskModal(editMode = false) {
         const modal = document.getElementById('taskModal');
         const title = document.getElementById('modalTitle');
@@ -361,22 +383,18 @@ class TaskManager {
         document.getElementById('actionModal').classList.remove('show');
     }
 
+    // 🔥 ИСПРАВЛЕНО: конфликт только при точном совпадении времени
     checkTimeConflict() {
         const date = document.getElementById('taskDate').value;
         const time = document.getElementById('taskTime').value;
         
         if (!date || !time) return;
 
-        const [hours, minutes] = time.split(':').map(Number);
-        const selectedTimeInMinutes = hours * 60 + minutes;
-
         const conflictingTask = this.tasks.find(task => {
             if (this.editingTaskId && task.id === this.editingTaskId) return false;
             const taskDate = task.date;
             if (taskDate !== date) return false;
-            const [taskHours, taskMinutes] = task.time.split(':').map(Number);
-            const taskTimeInMinutes = taskHours * 60 + taskMinutes;
-            return Math.abs(selectedTimeInMinutes - taskTimeInMinutes) < 60;
+            return task.time === time; // ✅ ТОЛЬКО ТОЧНОЕ СОВПАДЕНИЕ
         });
 
         if (conflictingTask) {
@@ -443,16 +461,12 @@ class TaskManager {
         }
     }
 
+    // 🔥 ИСПРАВЛЕНО: конфликт только при точном совпадении времени
     checkTimeConflictForTask(taskData, editingTaskId = null) {
-        const [hours, minutes] = taskData.time.split(':').map(Number);
-        const selectedTimeInMinutes = hours * 60 + minutes;
-
         return this.tasks.find(task => {
             if (editingTaskId && task.id === editingTaskId) return false;
             if (task.date !== taskData.date) return false;
-            const [taskHours, taskMinutes] = task.time.split(':').map(Number);
-            const taskTimeInMinutes = taskHours * 60 + taskMinutes;
-            return Math.abs(selectedTimeInMinutes - taskTimeInMinutes) < 60;
+            return task.time === taskData.time; // ✅ ТОЛЬКО ТОЧНОЕ СОВПАДЕНИЕ
         });
     }
 
@@ -473,15 +487,6 @@ class TaskManager {
         this.saveToStorage();
         this.renderCategories();
         this.closeAllModals();
-    }
-
-    toggleTaskComplete(taskId) {
-        const taskIndex = this.tasks.findIndex(t => t.id === taskId);
-        if (taskIndex !== -1) {
-            this.tasks[taskIndex].completed = !this.tasks[taskIndex].completed;
-            this.saveToStorage();
-            this.renderTasks();
-        }
     }
 
     editTask() {
