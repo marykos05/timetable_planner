@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Planner - Управление задачами</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок и фильтры -->
+        <header class="header">
+            <div class="date-header">
+                <button id="prevDay"><i class="fas fa-chevron-left"></i></button>
+                <h1 id="currentDate">Сегодня</h1>
+                <button id="nextDay"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            
+            <div class="filters">
+                <select id="categoryFilter">
+                    <option value="all">Все категории</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Список задач -->
+        <main class="tasks-container">
+            <div class="time-slots">
+                <!-- Временные слоты будут генерироваться через JS -->
+            </div>
+            
+            <div class="tasks-list" id="tasksList">
+                <!-- Задачи будут добавляться здесь -->
+                <div class="no-tasks" id="noTasks">
+                    <i class="fas fa-tasks"></i>
+                    <p>На этот день задач нет</p>
+                    <button id="addFirstTask" class="btn-primary">
+                        <i class="fas fa-plus"></i> Добавить первую задачу
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Кнопка добавления задачи -->
+        <button id="addTaskBtn" class="floating-btn">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- Модальное окно для задачи -->
+        <div id="taskModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Новая задача</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskTitle">Название задачи</label>
+                        <input type="text" id="taskTitle" required 
+                               placeholder="Введите название задачи...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskDate">Дата</label>
+                        <input type="date" id="taskDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskTime">Время</label>
+                        <input type="time" id="taskTime" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskCategory">Категория</label>
+                        <div class="category-selector">
+                            <select id="taskCategory" required>
+                                <!-- Категории будут добавляться через JS -->
+                            </select>
+                            <button type="button" id="newCategoryBtn" class="btn-icon">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskDescription">Описание</label>
+                        <textarea id="taskDescription" 
+                                  placeholder="Дополнительные детали..."></textarea>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="taskNotification">
+                        <label for="taskNotification">Установить напоминание</label>
+                    </div>
+                    
+                    <div class="form-group" id="notificationTimeGroup" style="display: none;">
+                        <label for="notificationTime">Напоминание за:</label>
+                        <select id="notificationTime">
+                            <option value="5">5 минут</option>
+                            <option value="15">15 минут</option>
+                            <option value="30">30 минут</option>
+                            <option value="60">1 час</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary close-modal">Отмена</button>
+                        <button type="submit" class="btn-primary" id="saveTaskBtn">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно для категорий -->
+        <div id="categoryModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Новая категория</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label for="categoryName">Название категории</label>
+                        <input type="text" id="categoryName" required 
+                               placeholder="Введите название...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoryColor">Цвет категории</label>
+                        <input type="color" id="categoryColor" value="#0088cc">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary close-modal">Отмена</button>
+                        <button type="submit" class="btn-primary">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно действий -->
+        <div id="actionModal" class="action-modal">
+            <div class="action-modal-content">
+                <button id="editTaskBtn">
+                    <i class="fas fa-edit"></i> Редактировать
+                </button>
+                <button id="moveTaskBtn">
+                    <i class="fas fa-calendar-alt"></i> Перенести
+                </button>
+                <button id="deleteTaskBtn" class="danger">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+                <button class="close-action-modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
