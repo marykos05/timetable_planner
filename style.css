@@ -213,11 +213,22 @@ body {
     color: var(--primary-color);
 }
 
+/* Невидимая кнопка выполнения */
 .complete-btn {
     position: absolute;
     left: 12px;
     top: 8px;
-    font-size: 14px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.complete-btn:hover {
+    background: rgba(0,0,0,0.05);
+    border-radius: 50%;
 }
 
 .more-btn {
@@ -531,22 +542,4 @@ body {
     .complete-btn {
         left: 10px;
     }
-}
-
-.complete-btn {
-    position: absolute;
-    left: 12px;
-    top: 8px;
-    font-size: 14px;
-    background: transparent;
-    border: none;
-    padding: 0;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-}
-
-.complete-btn:hover {
-    background: rgba(0,0,0,0.05);
-    border-radius: 50%;
 }
