@@ -230,56 +230,56 @@ class TaskManager {
     }
 
     createTaskElement(task) {
-        const category = this.categories.find(c => c.id === task.category);
-        const taskElement = document.createElement('div');
-        taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
-        taskElement.dataset.taskId = task.id;
-        taskElement.style.borderLeftColor = category.color;
+    const category = this.categories.find(c => c.id === task.category);
+    const taskElement = document.createElement('div');
+    taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+    taskElement.dataset.taskId = task.id;
+    taskElement.style.borderLeftColor = category.color;
 
-        taskElement.innerHTML = `
-            <div class="task-header">
-                <div style="flex: 1;">
-                    <div class="task-title-container">
-                        <span class="task-checkmark">${task.completed ? '✓' : ''}</span>
-                        <span class="task-title-text">${task.title}</span>
-                    </div>
-                    <div class="task-time">${task.time}</div>
+    taskElement.innerHTML = `
+        <div class="task-header">
+            <div style="flex: 1;">
+                <div class="task-title-container">
+                    <span class="task-checkmark">✓</span>
+                    <span class="task-title-text">${task.title}</span>
                 </div>
-                <button class="task-btn more-btn" data-task-id="${task.id}">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
+                <div class="task-time">${task.time}</div>
             </div>
-            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
-            <div class="task-category" style="background: ${category.color}">
-                ${category.name}
-            </div>
-            <div class="task-actions">
-                <button class="task-btn complete-btn" data-task-id="${task.id}"></button>
-            </div>
-        `;
+            <button class="task-btn more-btn" data-task-id="${task.id}">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+        ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+        <div class="task-category" style="background: ${category.color}">
+            ${category.name}
+        </div>
+        <div class="task-actions">
+            <button class="task-btn complete-btn" data-task-id="${task.id}"></button>
+        </div>
+    `;
 
-        taskElement.querySelector('.more-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
+    taskElement.querySelector('.more-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.selectedTaskId = task.id;
+        this.openActionModal(e);
+    });
+
+    taskElement.querySelector('.complete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleTaskComplete(task.id);
+    });
+
+    taskElement.addEventListener('click', (e) => {
+        if (!e.target.closest('.task-btn')) {
             this.selectedTaskId = task.id;
-            this.openActionModal(e);
-        });
+            this.openTaskModal(true);
+        }
+    });
 
-        taskElement.querySelector('.complete-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleTaskComplete(task.id);
-        });
+    return taskElement;
+}
 
-        taskElement.addEventListener('click', (e) => {
-            if (!e.target.closest('.task-btn')) {
-                this.selectedTaskId = task.id;
-                this.openTaskModal(true);
-            }
-        });
-
-        return taskElement;
-    }
-
-    // ✅ ОСНОВНОЕ ИСПРАВЛЕНИЕ: только DOM-обновление, без renderTasks
+   
     toggleTaskComplete(taskId) {
         const taskIndex = this.tasks.findIndex(t => t.id === taskId);
         if (taskIndex !== -1) {
@@ -382,7 +382,7 @@ class TaskManager {
         document.getElementById('actionModal').classList.remove('show');
     }
 
-    // ✅ Конфликт только при точном совпадении времени
+    
     checkTimeConflict() {
         const date = document.getElementById('taskDate').value;
         const time = document.getElementById('taskTime').value;
@@ -460,7 +460,7 @@ class TaskManager {
         }
     }
 
-    // ✅ Конфликт только при точном совпадении времени
+   
     checkTimeConflictForTask(taskData, editingTaskId = null) {
         return this.tasks.find(task => {
             if (editingTaskId && task.id === editingTaskId) return false;
@@ -565,4 +565,5 @@ document.addEventListener('DOMContentLoaded', () => {
         window.taskManager.checkTimeConflict();
     });
 });
+
 
