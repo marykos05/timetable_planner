@@ -543,3 +543,18 @@ body {
         left: 10px;
     }
 }
+
+/* Галочка — всегда видима, меняет цвет */
+.task-item .task-checkmark {
+    color: #888;
+    font-weight: bold;
+    font-size: 16px;
+    min-width: 20px;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+.task-item.completed .task-checkmark {
+    color: #4CAF50;
+    opacity: 0.7;
+}
