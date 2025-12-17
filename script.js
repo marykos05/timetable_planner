@@ -281,30 +281,27 @@ class TaskManager {
 
    
     toggleTaskComplete(taskId) {
-        const taskIndex = this.tasks.findIndex(t => t.id === taskId);
-        if (taskIndex !== -1) {
-            this.tasks[taskIndex].completed = !this.tasks[taskIndex].completed;
-            this.saveToStorage();
+    const taskIndex = this.tasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1) {
+        this.tasks[taskIndex].completed = !this.tasks[taskIndex].completed;
+        this.saveToStorage();
 
-            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
-            if (taskElement) {
-                const checkmark = taskElement.querySelector('.task-checkmark');
-                const titleText = taskElement.querySelector('.task-title-text');
-                
-                if (this.tasks[taskIndex].completed) {
-                    checkmark.textContent = '✓';
-                    taskElement.classList.add('completed');
-                    titleText.style.textDecoration = 'line-through';
-                    titleText.style.opacity = '0.7';
-                } else {
-                    checkmark.textContent = '';
-                    taskElement.classList.remove('completed');
-                    titleText.style.textDecoration = 'none';
-                    titleText.style.opacity = '1';
-                }
+        const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+        if (taskElement) {
+            const titleText = taskElement.querySelector('.task-title-text');
+            
+            if (this.tasks[taskIndex].completed) {
+                taskElement.classList.add('completed');
+                titleText.style.textDecoration = 'line-through';
+                titleText.style.opacity = '0.7';
+            } else {
+                taskElement.classList.remove('completed');
+                titleText.style.textDecoration = 'none';
+                titleText.style.opacity = '1';
             }
         }
     }
+}
 
     openTaskModal(editMode = false) {
         const modal = document.getElementById('taskModal');
@@ -565,5 +562,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.taskManager.checkTimeConflict();
     });
 });
+
 
 
