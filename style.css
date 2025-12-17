@@ -130,7 +130,7 @@ body {
     border-left: 4px solid var(--primary-color);
     border-radius: 10px;
     padding: 8px;
-    padding-left: 16px; /* отступ от левой границы */
+    padding-left: 16px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     transition: all 0.3s ease;
     flex: 1;
@@ -150,7 +150,6 @@ body {
     margin-bottom: 5px;
 }
 
-/* Новые стили для галочки и текста */
 .task-title-container {
     display: flex;
     align-items: center;
@@ -163,17 +162,18 @@ body {
     font-size: 16px;
     min-width: 20px;
     text-align: center;
+    transition: opacity 0.2s ease;
+}
+
+.task-item.completed .task-checkmark {
+    color: #8BC34A;
+    opacity: 0.7;
 }
 
 .task-title-text {
     font-weight: 600;
     font-size: 13px;
     word-break: break-word;
-}
-
-.task-completed {
-    text-decoration: line-through;
-    opacity: 0.7;
 }
 
 .task-category {
