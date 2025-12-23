@@ -3,7 +3,6 @@ const tg = window.Telegram.WebApp;
 tg.expand();
 tg.MainButton.setText('Сохранить').hide();
 
-// Функция для корректного форматирования даты (без часового пояса)
 function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -150,13 +149,11 @@ class TaskManager {
         const list = document.getElementById('tasksList');
         const noTasks = document.getElementById('noTasks');
 
-        // ✅ Удаляем ТОЛЬКО задачи (hour-block), но не удаляем noTasks из DOM
-        const existingBlocks = list.querySelectorAll('.hour-block');
-        existingBlocks.forEach(block => block.remove());
+        // Удаляем только задачи
+        const taskItems = list.querySelectorAll('.task-item');
+        taskItems.forEach(el => el.remove());
 
-        // ✅ Используем локальную дату
         const dateStr = formatDate(this.currentDate);
-
         let tasks = this.tasks.filter(t => {
             return t.date === dateStr && (filter === 'all' || t.category === filter);
         });
@@ -173,28 +170,10 @@ class TaskManager {
         }
         noTasks.style.display = 'none';
 
-        const byHour = {};
-        for (let h = 8; h <= 22; h++) {
-            byHour[h] = [];
-        }
-
-        tasks.forEach(t => {
-            const h = parseInt(t.time.split(':')[0]);
-            if (h >= 8 && h <= 22) {
-                byHour[h].push(t);
-            }
+        tasks.forEach(task => {
+            const taskElement = this.createTaskElement(task);
+            list.appendChild(taskElement);
         });
-
-        for (let h = 8; h <= 22; h++) {
-            if (byHour[h].length > 0) {
-                const block = document.createElement('div');
-                block.className = 'hour-block';
-                byHour[h].forEach(task => {
-                    block.appendChild(this.createTaskElement(task));
-                });
-                list.appendChild(block);
-            }
-        }
     }
 
     createTaskElement(task) {
@@ -203,6 +182,11 @@ class TaskManager {
         el.className = `task-item ${task.completed ? 'completed' : ''}`;
         el.dataset.taskId = task.id;
         el.style.borderLeftColor = cat.color;
+
+        // ✅ Позиционирование по времени
+        const [hours, minutes] = task.time.split(':').map(Number);
+        const top = (hours - 8) * 60 + minutes;
+        el.style.top = `${top}px`;
 
         el.innerHTML = `
             <div class="task-header">
@@ -289,7 +273,6 @@ class TaskManager {
             title.textContent = 'Новая задача';
             saveBtn.textContent = 'Создать';
             document.getElementById('taskForm').reset();
-            // ✅ Устанавливаем дату в локальном формате
             document.getElementById('taskDate').value = formatDate(this.currentDate);
         }
         modal.classList.add('show');
@@ -302,7 +285,7 @@ class TaskManager {
         const task = {
             id: this.editingTaskId || Date.now().toString(),
             title: document.getElementById('taskTitle').value,
-            date: document.getElementById('taskDate').value, // Уже ГГГГ-ММ-ДД
+            date: document.getElementById('taskDate').value,
             time: document.getElementById('taskTime').value,
             category: document.getElementById('taskCategory').value,
             description: document.getElementById('taskDescription').value,
@@ -324,7 +307,7 @@ class TaskManager {
 
         this.saveToStorage();
         this.closeAllModals();
-        this.renderTasks(this.currentFilter); // ✅ Обновление без перезагрузки
+        this.renderTasks(this.currentFilter);
     }
 
     deleteTask() {
@@ -404,7 +387,8 @@ class TaskManager {
     openActionModal(e) {
         const modal = document.getElementById('actionModal');
         const rect = e.target.getBoundingClientRect();
-        modal.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+        modal.style.left = `${rect.left + window.scrollX}px`;
+        modal.style.bottom = `${window.innerHeight - rect.top + window.scrollY + 5}px`;
         modal.classList.add('show');
     }
 }
@@ -412,6 +396,7 @@ class TaskManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
+
 
 
 
