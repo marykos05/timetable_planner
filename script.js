@@ -87,7 +87,19 @@ class TaskManager {
             this.createCategory();
         });
 
-        document.getElementById('newCategoryBtn').addEventListener('click', () => this.openCategoryModal());
+        document.getElementById('newCategoryBtn').addEventListener('click', () => {
+            // Сохраняем текущие значения формы перед открытием модалки категории
+            const title = document.getElementById('taskTitle')?.value || '';
+            const date = document.getElementById('taskDate')?.value || '';
+            const time = document.getElementById('taskTime')?.value || '';
+            const desc = document.getElementById('taskDescription')?.value || '';
+            const notify = document.getElementById('taskNotification')?.checked || false;
+            const notifyTime = document.getElementById('notificationTime')?.value || '15';
+
+            // Сохраняем в памяти
+            this.tempTaskData = { title, date, time, desc, notify, notifyTime };
+            this.openCategoryModal();
+        });
 
         document.getElementById('editTaskBtn').addEventListener('click', () => this.editTask());
         document.getElementById('moveTaskBtn').addEventListener('click', () => this.moveTask());
@@ -149,9 +161,8 @@ class TaskManager {
         const list = document.getElementById('tasksList');
         const noTasks = document.getElementById('noTasks');
 
-        // Удаляем только задачи
-        const taskItems = list.querySelectorAll('.task-item');
-        taskItems.forEach(el => el.remove());
+        // Удаляем все задачи и hour-block
+        list.innerHTML = '';
 
         const dateStr = formatDate(this.currentDate);
         let tasks = this.tasks.filter(t => {
@@ -166,14 +177,39 @@ class TaskManager {
 
         if (tasks.length === 0) {
             noTasks.style.display = 'block';
+            list.appendChild(noTasks);
             return;
         }
         noTasks.style.display = 'none';
 
+        // Группируем по часу
+        const tasksByHour = {};
+        for (let h = 8; h <= 22; h++) {
+            tasksByHour[h] = [];
+        }
+
         tasks.forEach(task => {
-            const taskElement = this.createTaskElement(task);
-            list.appendChild(taskElement);
+            const hour = parseInt(task.time.split(':')[0]);
+            if (hour >= 8 && hour <= 22) {
+                tasksByHour[hour].push(task);
+            }
         });
+
+        // Создаём hour-block для каждого часа
+        for (let hour = 8; hour <= 22; hour++) {
+            if (tasksByHour[hour].length > 0) {
+                const block = document.createElement('div');
+                block.className = 'hour-block';
+                block.style.top = `${(hour - 8) * 60}px`; // позиционируем по часу
+
+                tasksByHour[hour].forEach(task => {
+                    const taskEl = this.createTaskElement(task);
+                    block.appendChild(taskEl);
+                });
+
+                list.appendChild(block);
+            }
+        }
     }
 
     createTaskElement(task) {
@@ -182,11 +218,6 @@ class TaskManager {
         el.className = `task-item ${task.completed ? 'completed' : ''}`;
         el.dataset.taskId = task.id;
         el.style.borderLeftColor = cat.color;
-
-        // ✅ Позиционирование по времени
-        const [hours, minutes] = task.time.split(':').map(Number);
-        const top = (hours - 8) * 60 + minutes;
-        el.style.top = `${top}px`;
 
         el.innerHTML = `
             <div class="task-header">
@@ -267,13 +298,30 @@ class TaskManager {
                 document.getElementById('taskTime').value = task.time;
                 document.getElementById('taskCategory').value = task.category;
                 document.getElementById('taskDescription').value = task.description || '';
+                if (task.notification) {
+                    document.getElementById('taskNotification').checked = true;
+                    document.getElementById('notificationTimeGroup').style.display = 'block';
+                    document.getElementById('notificationTime').value = task.notificationTime || '15';
+                }
             }
         } else {
             this.editingTaskId = null;
             title.textContent = 'Новая задача';
             saveBtn.textContent = 'Создать';
             document.getElementById('taskForm').reset();
-            document.getElementById('taskDate').value = formatDate(this.currentDate);
+
+            // Восстанавливаем данные, если были
+            if (this.tempTaskData) {
+                document.getElementById('taskTitle').value = this.tempTaskData.title;
+                document.getElementById('taskDate').value = this.tempTaskData.date;
+                document.getElementById('taskTime').value = this.tempTaskData.time;
+                document.getElementById('taskDescription').value = this.tempTaskData.desc;
+                document.getElementById('taskNotification').checked = this.tempTaskData.notify;
+                document.getElementById('notificationTimeGroup').style.display = this.tempTaskData.notify ? 'block' : 'none';
+                document.getElementById('notificationTime').value = this.tempTaskData.notifyTime;
+            } else {
+                document.getElementById('taskDate').value = formatDate(this.currentDate);
+            }
         }
         modal.classList.add('show');
     }
@@ -290,7 +338,11 @@ class TaskManager {
             category: document.getElementById('taskCategory').value,
             description: document.getElementById('taskDescription').value,
             completed: false,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            notification: document.getElementById('taskNotification').checked,
+            notificationTime: document.getElementById('taskNotification').checked 
+                ? parseInt(document.getElementById('notificationTime').value) 
+                : null
         };
 
         const conflict = this.checkTimeConflictForTask(task, this.editingTaskId);
@@ -308,6 +360,7 @@ class TaskManager {
         this.saveToStorage();
         this.closeAllModals();
         this.renderTasks(this.currentFilter);
+        this.tempTaskData = null; // очищаем временные данные
     }
 
     deleteTask() {
@@ -350,6 +403,14 @@ class TaskManager {
         this.saveToStorage();
         this.renderCategories();
         this.closeAllModals();
+
+        // После создания категории — не закрываем форму задачи
+        if (document.getElementById('taskModal').classList.contains('show')) {
+            // форма уже открыта — ничего не делаем
+        } else {
+            // восстанавливаем данные и открываем форму задачи
+            this.openTaskModal();
+        }
     }
 
     saveToStorage() {
@@ -387,8 +448,8 @@ class TaskManager {
     openActionModal(e) {
         const modal = document.getElementById('actionModal');
         const rect = e.target.getBoundingClientRect();
-        modal.style.left = `${rect.left + window.scrollX}px`;
-        modal.style.bottom = `${window.innerHeight - rect.top + window.scrollY + 5}px`;
+        modal.style.right = '10px';
+        modal.style.bottom = `${window.innerHeight - rect.top + 10}px`;
         modal.classList.add('show');
     }
 }
@@ -396,6 +457,7 @@ class TaskManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
+
 
 
 
