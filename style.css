@@ -110,12 +110,15 @@ body {
     min-height: 900px;
 }
 
+/* 🔥 КЛЮЧЕВОЕ: hour-block — flex-контейнер */
 .hour-block {
+    position: absolute;
+    left: 0;
+    width: 100%;
     height: 60px;
     display: flex;
     gap: 8px;
-    padding-top: 8px;
-    padding-bottom: 2px;
+    padding: 0 15px 0 0;
 }
 
 .task-item {
@@ -145,11 +148,10 @@ body {
 
 .task-title-container {
     display: flex;
-    align-items: center;
+    alignments: center;
     gap: 6px;
 }
 
-/* Галочка — всегда видима */
 .task-checkmark {
     font-weight: bold;
     font-size: 16px;
@@ -408,9 +410,10 @@ body {
 .action-modal {
     display: none;
     position: fixed;
+    right: 10px;
     bottom: 0;
-    left: 0;
-    width: 100%;
+    width: auto;
+    max-width: 280px;
     background: white;
     border-radius: 20px 20px 0 0;
     z-index: 1500;
@@ -477,6 +480,7 @@ body {
     .task-item {
         padding: 8px;
         padding-left: 14px;
+        min-width: 100px;
     }
     .task-checkmark {
         min-width: 18px;
@@ -486,30 +490,5 @@ body {
         left: 10px;
     }
 }
-/* Обновлённый стиль для задач */
-.tasks-list {
-    position: relative;
-    background: white;
-    border-radius: 15px;
-    padding: 0 15px 15px 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    min-height: 900px;
-}
 
-.task-item {
-    position: absolute;
-    left: 0;
-    width: calc(100% - 30px);
-    /* остальные стили без изменений */
-}
-
-/* Модальное окно действий */
-.action-modal {
-    left: 0 !important;
-    bottom: 0 !important;
-    width: auto !important;
-    transform: translateX(-50%);
-    margin: 0;
-    padding: 0;
-}
 
