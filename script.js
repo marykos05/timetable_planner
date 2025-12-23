@@ -87,7 +87,6 @@ class TaskManager {
             this.createCategory();
         });
 
-   
         document.getElementById('newCategoryBtn').addEventListener('click', () => {
             this.openCategoryModal();
         });
@@ -152,7 +151,6 @@ class TaskManager {
         const list = document.getElementById('tasksList');
         const noTasks = document.getElementById('noTasks');
 
-        // Удаляем все задачи и hour-block
         list.innerHTML = '';
 
         const dateStr = formatDate(this.currentDate);
@@ -173,7 +171,6 @@ class TaskManager {
         }
         noTasks.style.display = 'none';
 
-        // Группируем по часу
         const tasksByHour = {};
         for (let h = 8; h <= 22; h++) {
             tasksByHour[h] = [];
@@ -186,12 +183,11 @@ class TaskManager {
             }
         });
 
-        // Создаём hour-block для каждого часа
         for (let hour = 8; hour <= 22; hour++) {
             if (tasksByHour[hour].length > 0) {
                 const block = document.createElement('div');
                 block.className = 'hour-block';
-                block.style.top = `${(hour - 8) * 60}px`; // позиционируем по часу
+                block.style.top = `${(hour - 8) * 60}px`;
 
                 tasksByHour[hour].forEach(task => {
                     const taskEl = this.createTaskElement(task);
@@ -272,7 +268,6 @@ class TaskManager {
         }
     }
 
-    
     openTaskModal(edit = false) {
         const modal = document.getElementById('taskModal');
         const title = document.getElementById('modalTitle');
@@ -290,11 +285,6 @@ class TaskManager {
                 document.getElementById('taskTime').value = task.time;
                 document.getElementById('taskCategory').value = task.category;
                 document.getElementById('taskDescription').value = task.description || '';
-                if (task.notification) {
-                    document.getElementById('taskNotification').checked = true;
-                    document.getElementById('notificationTimeGroup').style.display = 'block';
-                    document.getElementById('notificationTime').value = task.notificationTime || '15';
-                }
             }
         } else {
             this.editingTaskId = null;
@@ -302,7 +292,6 @@ class TaskManager {
             saveBtn.textContent = 'Создать';
             document.getElementById('taskForm').reset();
             document.getElementById('taskDate').value = formatDate(this.currentDate);
-            document.getElementById('notificationTimeGroup').style.display = 'none';
         }
         modal.classList.add('show');
     }
@@ -319,11 +308,7 @@ class TaskManager {
             category: document.getElementById('taskCategory').value,
             description: document.getElementById('taskDescription').value,
             completed: false,
-            createdAt: new Date().toISOString(),
-            notification: document.getElementById('taskNotification').checked,
-            notificationTime: document.getElementById('taskNotification').checked 
-                ? parseInt(document.getElementById('notificationTime').value) 
-                : null
+            createdAt: new Date().toISOString()
         };
 
         const conflict = this.checkTimeConflictForTask(task, this.editingTaskId);
@@ -372,7 +357,6 @@ class TaskManager {
         this.closeActionModal();
     }
 
-    
     createCategory() {
         const name = document.getElementById('categoryName').value.trim();
         const color = document.getElementById('categoryColor').value;
@@ -383,9 +367,7 @@ class TaskManager {
         this.categories.push({ id: 'custom_' + Date.now(), name, color });
         this.saveToStorage();
         this.renderCategories();
-        // Закрываем только модалку категории
-        document.getElementById('categoryModal').classList.remove('show');
-        // Форма задачи остаётся открытой (если была)
+        this.closeAllModals();
     }
 
     saveToStorage() {
@@ -432,6 +414,7 @@ class TaskManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
+
 
 
 
