@@ -87,17 +87,8 @@ class TaskManager {
             this.createCategory();
         });
 
+   
         document.getElementById('newCategoryBtn').addEventListener('click', () => {
-            // Сохраняем текущие значения формы перед открытием модалки категории
-            const title = document.getElementById('taskTitle')?.value || '';
-            const date = document.getElementById('taskDate')?.value || '';
-            const time = document.getElementById('taskTime')?.value || '';
-            const desc = document.getElementById('taskDescription')?.value || '';
-            const notify = document.getElementById('taskNotification')?.checked || false;
-            const notifyTime = document.getElementById('notificationTime')?.value || '15';
-
-            // Сохраняем в памяти
-            this.tempTaskData = { title, date, time, desc, notify, notifyTime };
             this.openCategoryModal();
         });
 
@@ -281,6 +272,7 @@ class TaskManager {
         }
     }
 
+    
     openTaskModal(edit = false) {
         const modal = document.getElementById('taskModal');
         const title = document.getElementById('modalTitle');
@@ -309,19 +301,8 @@ class TaskManager {
             title.textContent = 'Новая задача';
             saveBtn.textContent = 'Создать';
             document.getElementById('taskForm').reset();
-
-            // Восстанавливаем данные, если были
-            if (this.tempTaskData) {
-                document.getElementById('taskTitle').value = this.tempTaskData.title;
-                document.getElementById('taskDate').value = this.tempTaskData.date;
-                document.getElementById('taskTime').value = this.tempTaskData.time;
-                document.getElementById('taskDescription').value = this.tempTaskData.desc;
-                document.getElementById('taskNotification').checked = this.tempTaskData.notify;
-                document.getElementById('notificationTimeGroup').style.display = this.tempTaskData.notify ? 'block' : 'none';
-                document.getElementById('notificationTime').value = this.tempTaskData.notifyTime;
-            } else {
-                document.getElementById('taskDate').value = formatDate(this.currentDate);
-            }
+            document.getElementById('taskDate').value = formatDate(this.currentDate);
+            document.getElementById('notificationTimeGroup').style.display = 'none';
         }
         modal.classList.add('show');
     }
@@ -360,7 +341,6 @@ class TaskManager {
         this.saveToStorage();
         this.closeAllModals();
         this.renderTasks(this.currentFilter);
-        this.tempTaskData = null; // очищаем временные данные
     }
 
     deleteTask() {
@@ -392,6 +372,7 @@ class TaskManager {
         this.closeActionModal();
     }
 
+    
     createCategory() {
         const name = document.getElementById('categoryName').value.trim();
         const color = document.getElementById('categoryColor').value;
@@ -402,15 +383,9 @@ class TaskManager {
         this.categories.push({ id: 'custom_' + Date.now(), name, color });
         this.saveToStorage();
         this.renderCategories();
-        this.closeAllModals();
-
-        // После создания категории — не закрываем форму задачи
-        if (document.getElementById('taskModal').classList.contains('show')) {
-            // форма уже открыта — ничего не делаем
-        } else {
-            // восстанавливаем данные и открываем форму задачи
-            this.openTaskModal();
-        }
+        // Закрываем только модалку категории
+        document.getElementById('categoryModal').classList.remove('show');
+        // Форма задачи остаётся открытой (если была)
     }
 
     saveToStorage() {
@@ -457,6 +432,7 @@ class TaskManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
+
 
 
 
