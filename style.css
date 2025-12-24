@@ -147,8 +147,10 @@ body {
 .task-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 5px;
+    width: 100%;
+    overflow: hidden;
 }
 
 .task-title-container {
@@ -181,12 +183,15 @@ body {
 }
 
 .task-category {
-    display: inline-block;
+    background: var(--success-color);
+    color: white;
+    font-size: 10px;
     padding: 2px 6px;
     border-radius: 10px;
-    font-size: 10px;
-    color: white;
-    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 4px;
 }
 
 .task-time {
@@ -496,6 +501,7 @@ body {
         left: 10px;
     }
 }
+
 
 
 
