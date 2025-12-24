@@ -300,40 +300,40 @@ class TaskManager {
         modal.classList.add('show');
     }
 
-    saveTask() {
-        const form = document.getElementById('taskForm');
-        if (!form.checkValidity()) return form.reportValidity();
+saveTask() {
+    const form = document.getElementById('taskForm');
+    if (!form.checkValidity()) return form.reportValidity();
 
-        const task = {
-            id: this.editingTaskId || Date.now().toString(),
-            title: document.getElementById('taskTitle').value,
-            date: document.getElementById('taskDate').value,
-            time: document.getElementById('taskTime').value,
-            category: document.getElementById('taskCategory').value,
-            description: document.getElementById('taskDescription').value,
-            completed: false,
-            createdAt: new Date().toISOString()
-        };
+    const task = {
+        id: this.editingTaskId || Date.now().toString(),
+        title: document.getElementById('taskTitle').value,
+        date: document.getElementById('taskDate').value,
+        time: document.getElementById('taskTime').value,
+        category: document.getElementById('taskCategory').value,
+        description: document.getElementById('taskDescription').value,
+        completed: false,
+        createdAt: new Date().toISOString()
+    };
 
-        const conflict = this.checkTimeConflictForTask(task, this.editingTaskId);
-        if (conflict) {
-            alert(`⚠️ Конфликт времени: задача "${conflict.title}" уже назначена на ${conflict.time}`);
-            // Не прерываем — продолжаем сохранение
-        }
-
-        if (this.editingTaskId) {
-            const idx = this.tasks.findIndex(t => t.id === this.editingTaskId);
-            if (idx !== -1) {
-                this.tasks[idx] = { ...this.tasks[idx], ...task };
-            }
-        } else {
-            this.tasks.push(task);
-        }
-
-        this.saveToStorage();
-        this.closeAllModals();
-        this.renderTasks(this.currentFilter);
+    const conflict = this.checkTimeConflictForTask(task, this.editingTaskId);
+    if (conflict) {
+        alert(`⚠️ Нельзя создать задачу: на ${task.time} уже есть задача "${conflict.title}"`);
+        return;
     }
+
+    if (this.editingTaskId) {
+        const idx = this.tasks.findIndex(t => t.id === this.editingTaskId);
+        if (idx !== -1) {
+            this.tasks[idx] = { ...this.tasks[idx], ...task };
+        }
+    } else {
+        this.tasks.push(task);
+    }
+
+    this.saveToStorage();
+    this.closeAllModals();
+    this.renderTasks(this.currentFilter);
+}
 
     deleteTask() {
         if (confirm('Удалить задачу?')) {
@@ -421,6 +421,7 @@ class TaskManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
+
 
 
 
