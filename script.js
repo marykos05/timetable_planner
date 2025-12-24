@@ -200,54 +200,56 @@ class TaskManager {
         }
     }
 
-    createTaskElement(task) {
-        const cat = this.categories.find(c => c.id === task.category);
-        const el = document.createElement('div');
-        el.className = `task-item ${task.completed ? 'completed' : ''}`;
-        el.dataset.taskId = task.id;
-        el.style.borderLeftColor = cat.color;
-        el.style.height = '50px'; // ← фиксированная высота
+  createTaskElement(task) {
+    const cat = this.categories.find(c => c.id === task.category);
+    const el = document.createElement('div');
+    el.className = `task-item ${task.completed ? 'completed' : ''}`;
+    el.dataset.taskId = task.id;
+    el.style.borderLeftColor = cat.color;
+    el.style.height = '50px';
 
-        el.innerHTML = `
-            <div class="task-header">
-                <div style="flex:1">
-                    <div class="task-title-container">
-                        <span class="task-checkmark">✓</span>
-                        <span class="task-title-text">${task.title}</span>
-                    </div>
-                    <div class="task-time">${task.time}</div>
+    el.innerHTML = `
+        <div class="task-header">
+            <div style="flex:1; overflow: hidden;">
+                <div class="task-title-container">
+                    <span class="task-checkmark">✓</span>
+                    <span class="task-title-text">${task.title}</span>
                 </div>
-                <button class="task-btn more-btn" data-task-id="${task.id}">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
+                <div class="task-time">${task.time}</div>
             </div>
-            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
-            <div class="task-category" style="background:${cat.color}">${cat.name}</div>
-            <div class="task-actions">
-                <button class="task-btn complete-btn" data-task-id="${task.id}"></button>
-            </div>
-        `;
+            <button class="task-btn more-btn" data-task-id="${task.id}" style="margin-left: auto; padding: 4px 8px;">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+        ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+        <div class="task-category" style="background:${cat.color}; margin-top: 4px; font-size: 10px; padding: 2px 6px; border-radius: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${cat.name}
+        </div>
+        <div class="task-actions">
+            <button class="task-btn complete-btn" data-task-id="${task.id}"></button>
+        </div>
+    `;
 
-        el.querySelector('.more-btn').addEventListener('click', e => {
-            e.stopPropagation();
+    el.querySelector('.more-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        this.selectedTaskId = task.id;
+        this.openActionModal(e);
+    });
+
+    el.querySelector('.complete-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        this.toggleTaskComplete(task.id);
+    });
+
+    el.addEventListener('click', e => {
+        if (!e.target.closest('.task-btn')) {
             this.selectedTaskId = task.id;
-            this.openActionModal(e);
-        });
+            this.openTaskModal(true);
+        }
+    });
 
-        el.querySelector('.complete-btn').addEventListener('click', e => {
-            e.stopPropagation();
-            this.toggleTaskComplete(task.id);
-        });
-
-        el.addEventListener('click', e => {
-            if (!e.target.closest('.task-btn')) {
-                this.selectedTaskId = task.id;
-                this.openTaskModal(true);
-            }
-        });
-
-        return el;
-    }
+    return el;
+}
 
     toggleTaskComplete(taskId) {
         const idx = this.tasks.findIndex(t => t.id === taskId);
@@ -417,6 +419,7 @@ class TaskManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
+
 
 
 
