@@ -135,8 +135,8 @@ body {
     position: relative;
     height: 50px;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .task-item:hover {
@@ -182,18 +182,6 @@ body {
     word-break: break-word;
 }
 
-.task-category {
-    background: var(--success-color);
-    color: white;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 4px;
-}
-
 .task-time {
     font-size: 11px;
     color: var(--secondary-color);
@@ -237,6 +225,25 @@ body {
 .complete-btn:hover {
     background: rgba(0,0,0,0.05);
     border-radius: 50%;
+}
+
+/* Категория и три точки */
+.task-category-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.task-category {
+    background: var(--success-color);
+    color: white;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* No tasks */
@@ -501,6 +508,7 @@ body {
         left: 10px;
     }
 }
+
 
 
 
