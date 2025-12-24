@@ -210,13 +210,11 @@ class TaskManager {
 
         el.innerHTML = `
             <div class="task-header">
-                <div style="flex:1; overflow: hidden;">
-                    <div class="task-title-container">
-                        <span class="task-checkmark">✓</span>
-                        <span class="task-title-text">${task.title}</span>
-                    </div>
-                    <div class="task-time">${task.time}</div>
+                <div style="flex:1; overflow: hidden; display: flex; align-items: center; gap: 6px;">
+                    <span class="task-checkmark">✓</span>
+                    <span class="task-title-text">${task.title}</span>
                 </div>
+                <div class="task-time">${task.time}</div>
                 <div class="task-category-wrapper">
                     <div class="task-category" style="background:${cat.color};">
                         ${cat.name}
