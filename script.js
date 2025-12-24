@@ -149,7 +149,7 @@ class TaskManager {
         const list = document.getElementById('tasksList');
         const noTasks = document.getElementById('noTasks');
 
-        // Удаляем только задачи
+        // Удаляем все задачи
         const taskItems = list.querySelectorAll('.task-item');
         taskItems.forEach(el => el.remove());
 
@@ -170,10 +170,34 @@ class TaskManager {
         }
         noTasks.style.display = 'none';
 
+        // Группируем по часу
+        const tasksByHour = {};
+        for (let h = 8; h <= 22; h++) {
+            tasksByHour[h] = [];
+        }
+
         tasks.forEach(task => {
-            const taskElement = this.createTaskElement(task);
-            list.appendChild(taskElement);
+            const hour = parseInt(task.time.split(':')[0]);
+            if (hour >= 8 && hour <= 22) {
+                tasksByHour[hour].push(task);
+            }
         });
+
+        // Создаём hour-block для каждого часа
+        for (let hour = 8; hour <= 22; hour++) {
+            if (tasksByHour[hour].length > 0) {
+                const block = document.createElement('div');
+                block.className = 'hour-block';
+                block.style.top = `${(hour - 8) * 60}px`;
+
+                tasksByHour[hour].forEach(task => {
+                    const taskEl = this.createTaskElement(task);
+                    block.appendChild(taskEl);
+                });
+
+                list.appendChild(block);
+            }
+        }
     }
 
     createTaskElement(task) {
@@ -182,11 +206,7 @@ class TaskManager {
         el.className = `task-item ${task.completed ? 'completed' : ''}`;
         el.dataset.taskId = task.id;
         el.style.borderLeftColor = cat.color;
-
-        // ✅ Позиционирование по времени
-        const [hours, minutes] = task.time.split(':').map(Number);
-        const top = (hours - 8) * 60 + minutes;
-        el.style.top = `${top}px`;
+        el.style.height = '50px'; // ← фиксированная высота
 
         el.innerHTML = `
             <div class="task-header">
@@ -385,10 +405,10 @@ class TaskManager {
     }
 
     openActionModal(e) {
-        const modal = document.getElementById('action-modal');
+        const modal = document.getElementById('actionModal');
         const rect = e.target.getBoundingClientRect();
         // Позиционируем плашку СПРАВА от кнопки
-        modal.style.right = '10px';
+        modal.style.right = `${window.innerWidth - rect.right + 10}px`;
         modal.style.bottom = `${window.innerHeight - rect.top + 10}px`;
         modal.classList.add('show');
     }
@@ -397,6 +417,7 @@ class TaskManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
+
 
 
 
